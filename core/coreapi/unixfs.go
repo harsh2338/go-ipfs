@@ -29,6 +29,7 @@ import (
 	options "github.com/ipfs/interface-go-ipfs-core/options"
 	path "github.com/ipfs/interface-go-ipfs-core/path"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
@@ -200,14 +201,22 @@ func (api *UnixfsAPI) Get(ctx context.Context, p path.Path) (files.Node, error) 
 		log.Fatalf("Failed to connect to the Ethereum network: %v", err)
 	}
 
-	contract, err := NewPlagiarismContract(common.HexToAddress("0x186e74d1FA0c224bd73FA73a384c332Baa10E7f8"), conn)
+	contract, err := NewPlagiarismContract(common.HexToAddress("0x0622E9c7DB10713fD86a1836831EDc90e68CBB6D"), conn)
 	if err != nil {
 		log.Fatalf("Failed to instantiate contract: %v", err)
 	}
-	log.Fatalf("Successfully reached")
+	fmt.Printf("\nSuccessfully reached")
+	res1, err := contract.DoesUserHavePermission(&bind.CallOpts{}, pathString, common.HexToAddress(wallet))
 
-	// res1, _ := contract.FileCount(&bind.CallOpts{})
-	// res2, _ := contract.Inc(&bind.TransactOpts{})
+	if err != nil {
+		fmt.Printf("\nerror: %s", err)
+	}
+
+	fmt.Printf("\nResult of checking permission %t", res1)
+
+	if res1 {
+		return nil, nil
+	}
 
 	ses := api.core().getSession(ctx)
 
