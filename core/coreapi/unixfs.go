@@ -3,6 +3,8 @@ package coreapi
 import (
 	"context"
 	"fmt"
+	"log"
+	"strings"
 	"sync"
 
 	"github.com/ipfs/go-ipfs/core"
@@ -26,6 +28,9 @@ import (
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 	options "github.com/ipfs/interface-go-ipfs-core/options"
 	path "github.com/ipfs/interface-go-ipfs-core/path"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 type UnixfsAPI CoreAPI
@@ -179,9 +184,34 @@ func (api *UnixfsAPI) Add(ctx context.Context, files files.Node, opts ...options
 }
 
 func (api *UnixfsAPI) Get(ctx context.Context, p path.Path) (files.Node, error) {
+	fmt.Printf("Reached this point\n")
+	fmt.Printf("\n%s", p)
+	splitString := strings.Split(p.String(), ",")
+	pathString := splitString[0]
+
+	np := path.New(pathString)
+	fmt.Printf("\nnew Path %s", np)
+
+	wallet := splitString[1]
+	fmt.Printf("\nWallet %s", wallet)
+
+	conn, err := ethclient.Dial("http://127.0.0.1:8545")
+	if err != nil {
+		log.Fatalf("Failed to connect to the Ethereum network: %v", err)
+	}
+
+	contract, err := NewPlagiarismContract(common.HexToAddress("0x186e74d1FA0c224bd73FA73a384c332Baa10E7f8"), conn)
+	if err != nil {
+		log.Fatalf("Failed to instantiate contract: %v", err)
+	}
+	log.Fatalf("Successfully reached")
+
+	// res1, _ := contract.FileCount(&bind.CallOpts{})
+	// res2, _ := contract.Inc(&bind.TransactOpts{})
+
 	ses := api.core().getSession(ctx)
 
-	nd, err := ses.ResolveNode(ctx, p)
+	nd, err := ses.ResolveNode(ctx, np)
 	if err != nil {
 		return nil, err
 	}

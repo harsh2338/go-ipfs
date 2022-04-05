@@ -16,6 +16,10 @@ import (
 	options "github.com/ipfs/interface-go-ipfs-core/options"
 	path "github.com/ipfs/interface-go-ipfs-core/path"
 	mh "github.com/multiformats/go-multihash"
+
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 type BlockStat struct {
@@ -103,6 +107,22 @@ It outputs to stdout, and <key> is a base58 encoded multihash.
 		if err != nil {
 			return err
 		}
+
+		//------------------------------------------------------
+		conn, err := ethclient.Dial("http://127.0.0.1:8545")
+		if err != nil {
+			log.Fatalf("Failed to connect to the Ethereum network: %v", err)
+		}
+
+		contract, err := NewPlagiarismContract(common.HexToAddress("0x186e74d1FA0c224bd73FA73a384c332Baa10E7f8"), conn)
+		if err != nil {
+			log.Fatalf("Failed to instantiate contract: %v", err)
+		}
+
+		// amt, _ := contract.BalanceOf(&bind.CallOpts{}, common.HexToAddress("0x387fc6939b5e54b2f11793df05388f9d11942948"))
+		// BalanceOf(&bind.CallOpts{}, common.HexToAddress("0x387fc6939b5e54b2f11793df05388f9d11942948"))
+		res1, _ := contract.FileCount(&bind.CallOpts{})
+		fmt.Println(res1)
 
 		r, err := api.Block().Get(req.Context, path.New(req.Arguments[0]))
 		if err != nil {
