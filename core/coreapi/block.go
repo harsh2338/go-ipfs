@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"math/big"
 
 	blocks "github.com/ipfs/go-block-format"
 	cid "github.com/ipfs/go-cid"
@@ -36,44 +35,6 @@ func (api *BlockAPI) Put(ctx context.Context, src io.Reader, opts ...caopts.Bloc
 	if err != nil {
 		return nil, err
 	}
-	/**
-	--------------------------------------------------
-	*/
-	conn, err := ethclient.Dial("http://127.0.0.1:8545")
-	if err != nil {
-		log.Fatalf("Failed to connect to the Ethereum network: %v", err)
-	}
-
-	contract, err := NewPlagiarismContract(common.HexToAddress("0x186e74d1FA0c224bd73FA73a384c332Baa10E7f8"), conn)
-	if err != nil {
-		log.Fatalf("Failed to instantiate contract: %v", err)
-	}
-	log.Fatalf("Successfully reached")
-
-	// amt, _ := contract.BalanceOf(&bind.CallOpts{}, common.HexToAddress("0x387fc6939b5e54b2f11793df05388f9d11942948"))
-	// BalanceOf(&bind.CallOpts{}, common.HexToAddress("0x387fc6939b5e54b2f11793df05388f9d11942948"))
-
-	var strToConvert string
-
-	strToConvert = "Tutorial Gateway"
-
-	byteString := make([]byte, 16)
-	var ret [16]byte
-	copy(ret[:], byteString)
-
-	copy(byteString, strToConvert)
-	var arrayofarrays [][16]byte
-	// for i := range arrayofarrays { //assign
-	arrayofarrays[0] = ret
-	// }
-
-	copy(byteString, strToConvert)
-	res3, _ := contract.UploadFile(&bind.TransactOpts{}, big.NewInt(500), "docCID", "Code file 1", "Testing the contract", "codeFingerPrint", arrayofarrays, big.NewInt(1))
-
-	fmt.Println(res2)
-	fmt.Println(res1)
-	fmt.Println(res3)
-
 	data, err := ioutil.ReadAll(src)
 	if err != nil {
 		return nil, err

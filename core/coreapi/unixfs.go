@@ -201,20 +201,20 @@ func (api *UnixfsAPI) Get(ctx context.Context, p path.Path) (files.Node, error) 
 		log.Fatalf("Failed to connect to the Ethereum network: %v", err)
 	}
 
-	contract, err := NewPlagiarismContract(common.HexToAddress("0x0622E9c7DB10713fD86a1836831EDc90e68CBB6D"), conn)
+	contract, err := NewPlagiarismContract(common.HexToAddress("0xC010d5e96A721c642FcD28a6fae9E6e2Fc74F3C7"), conn)
 	if err != nil {
 		log.Fatalf("Failed to instantiate contract: %v", err)
 	}
 	fmt.Printf("\nSuccessfully reached")
-	res1, err := contract.DoesUserHavePermission(&bind.CallOpts{}, pathString, common.HexToAddress(wallet))
+	doesUserHavePermission, err := contract.DoesUserHavePermission(&bind.CallOpts{}, pathString, common.HexToAddress(wallet))
 
 	if err != nil {
 		fmt.Printf("\nerror: %s", err)
 	}
 
-	fmt.Printf("\nResult of checking permission %t", res1)
+	fmt.Printf("\nResult of checking permission %t", doesUserHavePermission)
 
-	if res1 {
+	if !doesUserHavePermission {
 		return nil, nil
 	}
 
